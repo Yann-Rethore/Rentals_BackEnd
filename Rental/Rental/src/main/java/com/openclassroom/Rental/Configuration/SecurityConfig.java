@@ -1,8 +1,12 @@
 package com.openclassroom.Rental.Configuration;
 
+import jakarta.servlet.Filter;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,10 +16,10 @@ import org.springframework.context.annotation.Bean;
 
 import org.springframework.stereotype.Component;
 
-@Component
+@Configuration
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
@@ -23,13 +27,27 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        ;
+        http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Ajout du filtre JWT
+
+
+        http.addFilterBefore((request, response, chain) -> {
+            if (request instanceof HttpServletRequest httpRequest) {
+                String path = httpRequest.getServletPath();
+                if (path.startsWith("/api/auth/")) {
+                    chain.doFilter(request, response); // Ignore le filtre pour /auth/*
+                } else {
+                    jwtAuthenticationFilter.doFilter(request, response, chain); // Applique le filtre ailleurs
+                }
+            }
+        }, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
