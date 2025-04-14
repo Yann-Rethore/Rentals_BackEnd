@@ -1,20 +1,13 @@
 package com.openclassroom.Rental.Controller;
 
 import com.openclassroom.Rental.Configuration.JwtUtil;
-import com.openclassroom.Rental.Configuration.jwtTokenGenerator;
 import com.openclassroom.Rental.DTO.LoginRequest;
 import com.openclassroom.Rental.Entities.Users;
-import com.openclassroom.Rental.Service.SecretManagerService;
 import com.openclassroom.Rental.Service.UserService;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-
-import javax.crypto.spec.SecretKeySpec;
-import java.security.Key;
 
 
 @RestController
