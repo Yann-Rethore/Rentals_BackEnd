@@ -3,13 +3,11 @@ package com.openclassroom.Rental.Configuration;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +45,18 @@ public class JwtUtil {
     }
 
     public Boolean validateToken(String token) {
-        return !isTokenExpired(token);
+      boolean  isValid;
+        try {
+            extractAllClaims(token);
+            isValid = true;
+        } catch (Exception e) {
+            isValid =  false;
+        }
+        if (isTokenExpired(token)) {
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     public String generateToken(String username) {
@@ -65,7 +74,9 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 heures
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
                 .compact();
+    }
 
-        //System.out.println("Token généré : " + token);
+    public String extractUserEmail(String token) {
+        return  extractClaim(token, Claims::getSubject);
     }
 }

@@ -1,7 +1,5 @@
 package com.openclassroom.Rental.Configuration;
-
-import jakarta.servlet.Filter;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -14,41 +12,34 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 
-import org.springframework.stereotype.Component;
-
 @Configuration
 public class SecurityConfig {
 
+    @Autowired
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    }
+
+
+    private static final String[] WHITE_LIST_URL = {
+             "/api/v1/auth/**", "/v2/api-docs", "/v3/api-docs",
+                    "/v3/api-docs/**", "/swagger-resources", "/swagger-resources/**", "/configuration/ui",
+                    "/configuration/security", "/swagger-ui/**", "/webjars/**", "/swagger-ui.html", "/api/auth/**",
+                    "/api/test/**", "/authenticate"
+            };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        ;
+
+
+
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Ajout du filtre JWT
-
-
-        http.addFilterBefore((request, response, chain) -> {
-            if (request instanceof HttpServletRequest httpRequest) {
-                String path = httpRequest.getServletPath();
-                if (path.startsWith("/api/auth/")) {
-                    chain.doFilter(request, response); // Ignore le filtre pour /auth/*
-                } else {
-                    jwtAuthenticationFilter.doFilter(request, response, chain); // Applique le filtre ailleurs
-                }
-            }
-        }, UsernamePasswordAuthenticationFilter.class);
-
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(
+                        auth -> auth.requestMatchers(WHITE_LIST_URL).permitAll().anyRequest().authenticated());
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+
+
     }
 
     @Bean
@@ -60,4 +51,6 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
 }
