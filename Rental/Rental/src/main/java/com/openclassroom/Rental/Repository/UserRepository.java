@@ -1,13 +1,14 @@
 package com.openclassroom.Rental.Repository;
 
-import com.openclassroom.Rental.Entities.Users;
+import com.openclassroom.Rental.DTO.UserDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository extends JpaRepository<Users, Long> {
-    boolean existsByName(String username);
+@Repository
+public interface UserRepository extends JpaRepository<UserDTO, Long> {
     boolean existsByEmail(String email);
 
-    Users findByEmail(String email);
+    UserDTO findByEmail(String email);
 
 
 }
