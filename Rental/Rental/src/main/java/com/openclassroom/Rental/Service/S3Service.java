@@ -1,5 +1,6 @@
 package com.openclassroom.Rental.Service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -8,7 +9,6 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
-import io.github.cdimascio.dotenv.Dotenv;
 import java.io.IOException;
 import java.nio.file.Paths;
 
@@ -16,18 +16,28 @@ import java.nio.file.Paths;
 public class S3Service {
 
     private final S3Client s3Client;
+    private final String bucketName;
+    private final String regionName;
 
-    Dotenv dotenv = Dotenv.load();
 
 
-    public S3Service() {
+
+
+    public S3Service(@Value("${AWS_ACCESS_KEY_ID}") String accessKeyId,
+                     @Value("${AWS_SECRET_ACCESS_KEY}") String secretKeyID,
+                     @Value("${AWS_BUCKET_REGION}") String regionName,
+                     @Value("${AWS_BUCKET_NAME}") String bucketName)  {
+
+        this.bucketName = bucketName;
+        this.regionName = regionName;
+
         AwsBasicCredentials awsCreds = AwsBasicCredentials.create(
-                dotenv.get("AWS_ACCESS_KEY_ID"),
-                dotenv.get("AWS_SECRET_ACCESS_KEY")
+                accessKeyId,
+                secretKeyID
         );
 
         this.s3Client = S3Client.builder()
-                .region(Region.of(dotenv.get("AWS_BUCKET_REGION")))
+                .region(Region.of(regionName))
                 .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
                 .build();
     }
@@ -40,14 +50,14 @@ public class S3Service {
 
             // Créer une requête pour télécharger le fichier
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(dotenv.get("AWS_BUCKET_NAME"))
+                    .bucket(bucketName)
                     .key(key)
                     .build();
 
             // Télécharger le fichier dans S3
             s3Client.putObject(putObjectRequest, Paths.get(filePath));
 
-            return "https://" + dotenv.get("AWS_BUCKET_NAME") + ".s3." + dotenv.get("AWS_BUCKET_REGION") + ".amazonaws.com/" + key;
+            return "https://" + bucketName  + ".s3." + regionName + ".amazonaws.com/" + key;
         } catch (S3Exception | IOException e) {
             throw new RuntimeException("Erreur lors du téléchargement du fichier dans S3", e);
         }

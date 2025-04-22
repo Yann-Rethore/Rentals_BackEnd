@@ -41,6 +41,7 @@ public class RentalsService {
     public boolean updateRental(Long id, String name, Double surface, Double price,  String description) {
         Optional<RentalDTO> rentalOptional = rentalsRepository.findById(id);
 
+        //Mise à jour de la location
         if (rentalOptional.isPresent()) {
             RentalDTO rental = rentalOptional.get();
             rental.setName(name);
@@ -54,7 +55,9 @@ public class RentalsService {
 
         return false;
 
-    }public Optional<RentalDTO> getRentalById(Long id) {
+    }
+
+    public Optional<RentalDTO> getRentalById(Long id) {
         return rentalsRepository.findById(id);
     }
 

@@ -5,7 +5,6 @@ import com.openclassroom.Rental.DTO.UserDTO;
 import com.openclassroom.Rental.Service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,10 +18,10 @@ import java.sql.Timestamp;
 @Tag(name = "Authentication")
 public class AuthController {
 
-    @Autowired
+
     private final UserService userService;
 
-    @Autowired
+
     private final JwtUtil jwtUtil;
 
     public AuthController(UserService userService, JwtUtil jwtUtil) {
@@ -55,7 +54,6 @@ public class AuthController {
         public ResponseEntity<?> login(@RequestBody UserDTO loginRequest) {
         // Invalider le token en cours
         SecurityContextHolder.clearContext();
-        System.out.println("loginRequest = " + loginRequest.getEmail() + "  " + loginRequest.getPassword());
 
         // Validation des champs
         if (loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
@@ -73,7 +71,6 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"Identifiants invalides\"}");
             }
             else {
-                System.out.println("user = " + user.getId());
             // Génération du token JWT
             String token = jwtUtil.generateToken(email);
 

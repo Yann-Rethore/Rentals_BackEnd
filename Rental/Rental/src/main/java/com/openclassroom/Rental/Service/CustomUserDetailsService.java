@@ -10,7 +10,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Remplacez cette logique par votre propre implémentation
+
         throw new UsernameNotFoundException("Utilisateur non trouvé : " + username);
     }
 }

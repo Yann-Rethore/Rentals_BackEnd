@@ -2,7 +2,6 @@ package com.openclassroom.Rental.Controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.Rental.DTO.RentalDTO;
-import io.github.cdimascio.dotenv.Dotenv;
 import com.openclassroom.Rental.Service.S3Service;
 import com.openclassroom.Rental.Service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +25,10 @@ import java.util.Optional;
 @RequestMapping("/api")
 @Tag(name = "Locations")
 public class RentalsController {
+
+
+    @Value("${AWS_URL}")
+    private String awsUrl;
 
 
     private final RentalsService rentalsService;
@@ -61,15 +65,14 @@ public class RentalsController {
 
         try {
 
-            // Upload the file to S3
+            // enregistrement du fichier dans S3
             s3Service.uploadFile(picture, key);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\": \"Failed to upload picture\"}");
         }
-
-        Dotenv dotenv = Dotenv.load();
-        String fileUrl = dotenv.get("AWS_URL") + key;
+        // Construction de l'URL complète
+        String fileUrl = awsUrl + key;
 
         // Extraire le jeton
         String token = authorizationHeader.substring(7);
@@ -130,19 +133,15 @@ public class RentalsController {
     {
 
 
-
+        //enregistrement de la location mise à jour
         try {
-            boolean updated = rentalsService.updateRental(
+              rentalsService.updateRental(
                     id,
                     name,
                     surface,
                     price,
                     description
             );
-
-            if (!updated) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"Rental not found\"}");
-            }
 
             return ResponseEntity.ok("{\"message\": \"Rental updated !\"}");
         } catch (Exception e) {

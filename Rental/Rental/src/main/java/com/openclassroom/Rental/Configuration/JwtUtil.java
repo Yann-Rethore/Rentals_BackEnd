@@ -1,5 +1,6 @@
 package com.openclassroom.Rental.Configuration;
 
+import com.openclassroom.Rental.Service.SecretManagerService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,8 +17,16 @@ import javax.crypto.spec.SecretKeySpec;
 @Service
 public class JwtUtil {
 
-    byte[] secretBytes = com.openclassroom.Rental.Service.SecretManagerService.getSecret();
-    Key SECRET_KEY = new SecretKeySpec(secretBytes, SignatureAlgorithm.HS256.getJcaName());
+    private final Key SECRET_KEY;
+    SecretManagerService secretManagerService;
+
+    public JwtUtil(SecretManagerService secretManagerService) {
+            this.secretManagerService = secretManagerService;
+            byte[] secretBytes = secretManagerService.getSecret();
+            this.SECRET_KEY = new SecretKeySpec(secretBytes, SignatureAlgorithm.HS256.getJcaName());
+    }
+
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
