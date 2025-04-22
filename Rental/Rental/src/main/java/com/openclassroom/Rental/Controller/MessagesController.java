@@ -5,7 +5,6 @@ import com.openclassroom.Rental.DTO.MessageDTO;
 import com.openclassroom.Rental.Service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Messages")
 public class MessagesController {
 
-    @Autowired
+
     private final MessageService messageService;
 
     public MessagesController (MessageService messageService) {
@@ -27,8 +26,6 @@ public class MessagesController {
     public ResponseEntity<?> sendMessage(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader,
             @RequestBody MessageDTO messageData) {
-
-        System.out.println(messageData.getRental_id());
 
 
 

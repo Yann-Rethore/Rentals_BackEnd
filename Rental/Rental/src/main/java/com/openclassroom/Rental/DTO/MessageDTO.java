@@ -23,7 +23,6 @@ public class MessageDTO {
 
     @Column(name = "rental_id", nullable = false)
     @Schema(description = "Identifiant de la location associée", example = "101")
-
     private Long rental_id;
 
     @Column(name = "user_id", nullable = false)
@@ -33,8 +32,6 @@ public class MessageDTO {
     @Column(name = "message", nullable = false)
     @Schema(description = "Contenu du message", example = "Bonjour, je suis intéressé par cette location.")
     private String message;
-
-
 
     @Column(name = "created_at", nullable = false)
     @Schema(description = "Date de création du message", example = "2023-10-01T12:00:00")
