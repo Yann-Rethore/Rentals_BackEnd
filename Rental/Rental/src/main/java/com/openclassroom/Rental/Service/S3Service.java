@@ -1,5 +1,6 @@
 package com.openclassroom.Rental.Service;
 
+import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,5 +63,11 @@ public class S3Service {
             throw new RuntimeException("Erreur lors du téléchargement du fichier dans S3", e);
         }
 
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        if (s3Client != null) {
+        s3Client.close();}
     }
 }
