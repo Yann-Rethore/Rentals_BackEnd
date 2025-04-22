@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
+
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
 

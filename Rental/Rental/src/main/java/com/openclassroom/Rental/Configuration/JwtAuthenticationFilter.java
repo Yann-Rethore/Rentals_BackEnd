@@ -53,18 +53,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
-  /* @Override
-   protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request,
-                                   jakarta.servlet.http.@NotNull HttpServletResponse response, jakarta.servlet.FilterChain filterChain)
-           throws jakarta.servlet.ServletException, IOException {
 
-       final String requestTokenHeader = request.getHeader("Authorization");
-
-       // JWT Token is in the form "Bearer token". Remove Bearer word and get only the
-       // Token
-       if (requestTokenHeader == null && !requestTokenHeader.startsWith("Bearer ")) {
-           logger.warn("JWT Token does not begin with Bearer String");
-       }
-       filterChain.doFilter(request, response);
-   }*/
 
