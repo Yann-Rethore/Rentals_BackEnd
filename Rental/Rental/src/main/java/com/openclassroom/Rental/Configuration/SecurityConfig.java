@@ -18,7 +18,8 @@ public class SecurityConfig {
 @Autowired
 JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
+@Autowired
+private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     private static final String[] WHITE_LIST_URL = {
              "/api/v1/auth/**", "/v2/api-docs", "/v3/api-docs",
@@ -35,7 +36,9 @@ JwtAuthenticationFilter jwtAuthenticationFilter;
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers(WHITE_LIST_URL).permitAll().anyRequest().authenticated());
+                        auth -> auth.requestMatchers(WHITE_LIST_URL).permitAll().anyRequest().authenticated())
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint));
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
 
